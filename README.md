@@ -99,7 +99,8 @@ package.json
 
 ## Screenshots
 
-![Gameplay screenshot](assets/images/screenshot1.png)
+![Gameplay screenshot player](assets/images/screenshot1.png)
+![Gameplay screenshot monsters](assets/images/screenshot2.png)
 
 ---
 
