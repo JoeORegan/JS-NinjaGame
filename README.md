@@ -100,7 +100,8 @@ package.json
 ## Screenshots
 
 ![Gameplay screenshot player](assets/images/screenshot1.png)
-![Gameplay screenshot monsters](assets/images/screenshot2.png)
+![Gameplay screenshot moving monsters](assets/images/screenshot2.png)
+![Gameplay screenshot shooting projectiles](assets/images/screenshot3.png)
 
 ---
 
