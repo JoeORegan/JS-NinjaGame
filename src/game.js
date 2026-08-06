@@ -7,6 +7,15 @@ function normalize(vx, vy) {
     return { x: vx / len, y: vy / len };
 }
 
+function intersectsAABB(a, b) {
+    return (
+        a.left < b.right &&
+        a.right > b.left &&
+        a.top < b.bottom &&
+        a.bottom > b.top
+    );
+}
+
 export class Game {
     constructor(canvas) {
         this.canvas = canvas;
@@ -38,11 +47,9 @@ export class Game {
         this.monsterImage = monster;
         this.projectileImage = projectile;
 
-        // Player at 10% from left, centered vertically (tutorial)
         this.playerPos.x = this.canvas.width * 0.1;
         this.playerPos.y = this.canvas.height * 0.5;
 
-        // Click/tap to shoot
         this.canvas.addEventListener("pointerdown", (e) => this.onPointerDown(e));
 
         this.running = true;
@@ -66,13 +73,19 @@ export class Game {
         const maxY = this.canvas.height - mh * 0.5;
         const y = randInt(Math.ceil(minY), Math.floor(maxY));
 
-        // random duration 2..4s equivalent
         const duration = randInt(2, 4);
         const startX = this.canvas.width + mw * 0.5;
         const endX = -mw * 0.5;
         const speed = (startX - endX) / duration;
 
-        this.monsters.push({ x: startX, y, speed, w: mw, h: mh });
+        this.monsters.push({
+            x: startX,
+            y,
+            speed,
+            w: mw,
+            h: mh,
+            active: true
+        });
     }
 
     onPointerDown(e) {
@@ -86,18 +99,14 @@ export class Game {
         const offsetX = touchX - this.playerPos.x;
         const offsetY = touchY - this.playerPos.y;
 
-        // Don't shoot backwards
-        if (offsetX < 0) return;
+        if (offsetX < 0) return; // no backward shots
 
-        // Unit direction * 1000
         const dir = normalize(offsetX, offsetY);
         const shootAmount = { x: dir.x * 1000, y: dir.y * 1000 };
 
-        // Real destination
         const destX = this.playerPos.x + shootAmount.x;
         const destY = this.playerPos.y + shootAmount.y;
 
-        // MoveTo over 2 seconds equivalent
         const duration = 2.0;
         const vx = (destX - this.playerPos.x) / duration;
         const vy = (destY - this.playerPos.y) / duration;
@@ -107,10 +116,48 @@ export class Game {
             y: this.playerPos.y,
             vx,
             vy,
-            life: duration, // auto-remove after 2s
+            life: duration,
             w: this.projectileImage.width,
-            h: this.projectileImage.height
+            h: this.projectileImage.height,
+            active: true
         });
+    }
+
+    projectileAABB(p) {
+        return {
+            left: p.x - p.w * 0.5,
+            right: p.x + p.w * 0.5,
+            top: p.y - p.h * 0.5,
+            bottom: p.y + p.h * 0.5
+        };
+    }
+
+    monsterAABB(m) {
+        return {
+            left: m.x - m.w * 0.5,
+            right: m.x + m.w * 0.5,
+            top: m.y - m.h * 0.5,
+            bottom: m.y + m.h * 0.5
+        };
+    }
+
+    handleCollisions() {
+        for (const p of this.projectiles) {
+            if (!p.active) continue;
+            const pa = this.projectileAABB(p);
+
+            for (const m of this.monsters) {
+                if (!m.active) continue;
+                const ma = this.monsterAABB(m);
+
+                if (intersectsAABB(pa, ma)) {
+                    // Equivalent of removing both nodes on contact
+                    p.active = false;
+                    m.active = false;
+                    break;
+                }
+            }
+        }
     }
 
     loop(timestamp) {
@@ -127,52 +174,47 @@ export class Game {
     }
 
     update(dt) {
-        // Spawn monsters every 1.5s
         this.spawnTimer += dt;
         while (this.spawnTimer >= this.spawnInterval) {
             this.spawnTimer -= this.spawnInterval;
             this.addMonster();
         }
 
-        // Move monsters
         for (const m of this.monsters) {
+            if (!m.active) continue;
             m.x -= m.speed * dt;
         }
 
-        // Remove monsters off left edge
-        this.monsters = this.monsters.filter((m) => m.x > -m.w * 0.5);
-
-        // Move projectiles
         for (const p of this.projectiles) {
+            if (!p.active) continue;
             p.x += p.vx * dt;
             p.y += p.vy * dt;
             p.life -= dt;
+            if (p.life <= 0) p.active = false;
         }
 
-        // Remove projectiles after their move duration
-        this.projectiles = this.projectiles.filter((p) => p.life > 0);
+        this.handleCollisions();
+
+        this.monsters = this.monsters.filter((m) => m.active && m.x > -m.w * 0.5);
+        this.projectiles = this.projectiles.filter((p) => p.active);
     }
 
     render() {
         const { ctx, canvas } = this;
 
-        // Gray background
         ctx.fillStyle = "#999999";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Player
         ctx.drawImage(
             this.player,
             this.playerPos.x - this.player.width * 0.5,
             this.playerPos.y - this.player.height * 0.5
         );
 
-        // Monsters
         for (const m of this.monsters) {
             ctx.drawImage(this.monsterImage, m.x - m.w * 0.5, m.y - m.h * 0.5);
         }
 
-        // Projectiles
         for (const p of this.projectiles) {
             ctx.drawImage(this.projectileImage, p.x - p.w * 0.5, p.y - p.h * 0.5);
         }

@@ -28,8 +28,8 @@ Tutorial source: <https://www.kodeco.com/1848-cocos2d-x-tutorial-for-beginners>
 
 ## Controls
 
-- **Move:** `W` / `S` or `↑` / `↓`
-- **Fire:** `Space`
+- **Aim:** `Mouse`
+- **Fire:** `Right-Click`
 
 ---
 
