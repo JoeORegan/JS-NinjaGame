@@ -153,6 +153,9 @@ export class Game {
         const vx = (destX - this.playerPos.x) / duration;
         const vy = (destY - this.playerPos.y) / duration;
 
+        const baseAngle = Math.atan2(vy, vx);
+        const spinSpeed = 10; // radians/sec (~573 deg/sec). try 6..14
+
         this.projectiles.push({
             x: this.playerPos.x,
             y: this.playerPos.y,
@@ -161,6 +164,8 @@ export class Game {
             life: duration,
             w: this.projectileImage.width,
             h: this.projectileImage.height,
+            angle: baseAngle,
+            spin: spinSpeed,
             active: true
         });
     }
@@ -230,6 +235,7 @@ export class Game {
             if (!p.active) continue;
             p.x += p.vx * dt;
             p.y += p.vy * dt;
+            p.angle += p.spin * dt; // spin
             p.life -= dt;
             if (p.life <= 0) p.active = false;
         }
@@ -259,7 +265,11 @@ export class Game {
         }
 
         for (const p of this.projectiles) {
-            ctx.drawImage(this.projectileImage, p.x - p.w * 0.5, p.y - p.h * 0.5);
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.angle);
+            ctx.drawImage(this.projectileImage, -p.w * 0.5, -p.h * 0.5);
+            ctx.restore();
 
             if (this.debug) this.drawProjectileDebug(p);
         }
