@@ -30,6 +30,7 @@ Tutorial source: <https://www.kodeco.com/1848-cocos2d-x-tutorial-for-beginners>
 
 - **Aim:** `Mouse`
 - **Fire:** `Right-Click`
+- **Debug:** `P`
 
 ---
 

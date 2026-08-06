@@ -1,54 +1,66 @@
 <!doctype html>
 <html lang="en-IE" data-theme="dark">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="author" content="Joe O'Regan" />
-  <meta name="description" content="Ninja Game JavaScript" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ninja Game JS</title>
-  <link rel="stylesheet" href="./css/styles.css" />
+    <meta charset="UTF-8" />
+    <meta name="author" content="Joe O'Regan" />
+    <meta name="description" content="Ninja Game JavaScript" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ninja Game JS</title>
+    <link rel="stylesheet" href="./css/styles.css" />
 </head>
+
 <body>
-  <header class="topbar">
-    <div class="container topbar-row">
-      <nav class="topnav" aria-label="Main navigation">
-        <a class="nav-link" href="https://joeoregan.github.io/">Home</a>
-        <a class="nav-link active" href="./">Ninja Game</a>
-      </nav>
+    <header class="topbar">
+        <div class="container topbar-row">
+            <nav class="topnav" aria-label="Main navigation">
+                <a class="nav-link" href="https://joeoregan.github.io/">Home</a>
+                <a class="nav-link active" href="./">Ninja Game</a>
+            </nav>
 
-      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle dark/light theme">
-        Toggle Theme
-      </button>
-    </div>
-  </header>
+            <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle dark/light theme">
+                Toggle Theme
+            </button>
+        </div>
+    </header>
 
-  <main class="container page-content">
-    <section class="page-panel">
-      <h1>Ninja Game JS</h1>
+    <main class="container page-content">
+        <section class="page-panel">
+            <h1>Ninja Game JS</h1>
 
-      <div class="canvas-wrap">
-        <canvas id="game" width="960" height="640" tabindex="0" aria-label="Ninja game canvas"></canvas>
-      </div>
-    </section>
-  </main>
+            <div class="canvas-wrap">
+                <canvas id="game" width="960" height="640" tabindex="0" aria-label="Ninja game canvas"></canvas>
+            </div>
+        </section>
 
-  <script>
-    (function () {
-      const saved = localStorage.getItem("ninja-theme");
-      if (saved === "light" || saved === "dark") {
-        document.documentElement.setAttribute("data-theme", saved);
-      }
+        <section class="page-panel">
+            <h2>Controls</h2>
+            <ul>
+                <li><b>Fire:</b> <code>Click</code> / <code>Tap</code></li>
+                <li><b>Debug:</b> <code>P</code> (toggle hitboxes)</li>
+                <li><b>Theme:</b> Toggle Theme button</li>
+            </ul>
+        </section>
+    </main>
 
-      const btn = document.getElementById("themeToggle");
-      btn?.addEventListener("click", function () {
-        const current = document.documentElement.getAttribute("data-theme") || "dark";
-        const next = current === "dark" ? "light" : "dark";
-        document.documentElement.setAttribute("data-theme", next);
-        localStorage.setItem("ninja-theme", next);
-      });
-    })();
-  </script>
+    <script>
+        (function () {
+            const saved = localStorage.getItem("ninja-theme");
+            if (saved === "light" || saved === "dark") {
+                document.documentElement.setAttribute("data-theme", saved);
+            }
 
-  <script type="module" src="./src/main.js"></script>
+            const btn = document.getElementById("themeToggle");
+            btn?.addEventListener("click", function () {
+                const current = document.documentElement.getAttribute("data-theme") || "dark";
+                const next = current === "dark" ? "light" : "dark";
+                document.documentElement.setAttribute("data-theme", next);
+                localStorage.setItem("ninja-theme", next);
+            });
+        })();
+    </script>
+
+    <script type="module" src="./src/main.js"></script>
 </body>
+
 </html>

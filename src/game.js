@@ -34,6 +34,8 @@ export class Game {
         this.spawnInterval = 1.5; // seconds
 
         this.running = false;
+
+        this.debug = false;
     }
 
     async start() {
@@ -51,6 +53,10 @@ export class Game {
         this.playerPos.y = this.canvas.height * 0.5;
 
         this.canvas.addEventListener("pointerdown", (e) => this.onPointerDown(e));
+
+        window.addEventListener("keydown", (e) => {
+            if (e.key.toLowerCase() === "p") this.debug = !this.debug;
+        });
 
         this.running = true;
         requestAnimationFrame((t) => this.loop(t));
@@ -213,10 +219,45 @@ export class Game {
 
         for (const m of this.monsters) {
             ctx.drawImage(this.monsterImage, m.x - m.w * 0.5, m.y - m.h * 0.5);
+
+            if (this.debug) this.drawMonsterDebug(m);
         }
 
         for (const p of this.projectiles) {
             ctx.drawImage(this.projectileImage, p.x - p.w * 0.5, p.y - p.h * 0.5);
+
+            if (this.debug) this.drawProjectileDebug(p);
         }
+
+        if (this.debug) {
+            ctx.fillStyle = "#ff8080";
+            ctx.font = "16px monospace";
+            ctx.fillText("DEBUG: ON (P to toggle)", 16, 24);
+        }
+    }
+
+    drawMonsterDebug(m) {
+        const { ctx } = this;
+        const left = m.x - m.w * 0.5;
+        const top = m.y - m.h * 0.5;
+
+        ctx.save();
+        ctx.strokeStyle = "rgba(255, 64, 64, 0.95)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(left, top, m.w, m.h);
+        ctx.restore();
+    }
+
+    drawProjectileDebug(p) {
+        const { ctx } = this;
+        const r = Math.max(p.w, p.h) * 0.5; // circle-style physics proxy
+
+        ctx.save();
+        ctx.strokeStyle = "rgba(255, 64, 64, 0.95)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
     }
 }
