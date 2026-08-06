@@ -99,7 +99,7 @@ package.json
 
 ## Screenshots
 
-![Gameplay screenshot](docs/images/screenshot-gameplay-01.png)
+![Gameplay screenshot](assets/images/screenshot1.png)
 
 ---
 
