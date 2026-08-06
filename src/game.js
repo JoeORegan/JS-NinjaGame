@@ -1,3 +1,5 @@
+import { AudioManager } from "./audio/audio.js";
+
 function randInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -33,6 +35,10 @@ export class Game {
         this.spawnTimer = 0;
         this.spawnInterval = 1.5; // seconds
 
+        this.audio = new AudioManager();
+        this.audioUnlocked = false;
+        this.musicLoaded = false;
+
         this.running = false;
 
         this.debug = false;
@@ -45,6 +51,18 @@ export class Game {
             this.loadImage("./assets/images/projectile.png")
         ]);
 
+        await Promise.all([
+            this.audio.loadMusic("./assets/audio/music/background-music-aac.mp3", {
+                volume: 0.35,
+                loop: true
+            }),
+            this.audio.loadEffect("pew", "./assets/audio/sfx/pew-pew-lei.mp3", {
+                volume: 0.8,
+                poolSize: 8
+            })
+        ]);
+        this.musicLoaded = true;
+
         this.player = player;
         this.monsterImage = monster;
         this.projectileImage = projectile;
@@ -55,7 +73,13 @@ export class Game {
         this.canvas.addEventListener("pointerdown", (e) => this.onPointerDown(e));
 
         window.addEventListener("keydown", (e) => {
-            if (e.key.toLowerCase() === "p") this.debug = !this.debug;
+            const k = e.key.toLowerCase();
+
+            if (k === "p") this.debug = !this.debug;
+            else if (k === "m") {
+                this.audio.toggleEnabled();
+                if (this.audio.enabled) this.unlockAudioIfNeeded();
+            }
         });
 
         this.running = true;
@@ -95,6 +119,9 @@ export class Game {
     }
 
     onPointerDown(e) {
+        this.unlockAudioIfNeeded();
+        this.audio.playEffect("pew");
+
         const rect = this.canvas.getBoundingClientRect();
         const scaleX = this.canvas.width / rect.width;
         const scaleY = this.canvas.height / rect.height;
@@ -259,5 +286,11 @@ export class Game {
         ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
         ctx.stroke();
         ctx.restore();
+    }
+
+    unlockAudioIfNeeded() {
+        if (this.audioUnlocked || !this.musicLoaded) return;
+        this.audioUnlocked = true;
+        this.audio.playMusic();
     }
 }

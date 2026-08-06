@@ -21,8 +21,10 @@ Tutorial source: <https://www.kodeco.com/1848-cocos2d-x-tutorial-for-beginners>
 
 ## Features
 
-- Player ship movement (keyboard)
-- Weapons
+- Monster movement
+- Projectile firing
+- Collision detection
+- Debug mode
 
 ---
 
@@ -30,7 +32,8 @@ Tutorial source: <https://www.kodeco.com/1848-cocos2d-x-tutorial-for-beginners>
 
 - **Aim:** `Mouse`
 - **Fire:** `Right-Click`
-- **Debug:** `P`
+- **Debug Toggle:** `P`
+- **Music Toggle:** `M`
 
 ---
 
@@ -79,10 +82,9 @@ assets/
     music/
     sfx/
   images/
+css/
 src/
   audio/
-  entities/
-  fx/
   game.js
   input.js
 index.html
@@ -103,6 +105,7 @@ package.json
 ![Gameplay screenshot player](assets/images/screenshot1.png)
 ![Gameplay screenshot moving monsters](assets/images/screenshot2.png)
 ![Gameplay screenshot shooting projectiles](assets/images/screenshot3.png)
+![Gameplay screenshot debug collisions](assets/images/screenshot4.png)
 
 ---
 
