@@ -40,8 +40,19 @@ export class Game {
         this.musicLoaded = false;
 
         this.running = false;
-
         this.debug = false;
+
+        this.onPointerDownBound = (e) => this.onPointerDown(e);
+        this.onKeyDownBound = (e) => {
+            const k = e.key.toLowerCase();
+
+            if (k === "p") {
+                this.debug = !this.debug;
+            } else if (k === "m") {
+                this.audio.toggleEnabled();
+                if (this.audio.enabled) this.unlockAudioIfNeeded();
+            }
+        };
     }
 
     async start() {
@@ -70,20 +81,18 @@ export class Game {
         this.playerPos.x = this.canvas.width * 0.1;
         this.playerPos.y = this.canvas.height * 0.5;
 
-        this.canvas.addEventListener("pointerdown", (e) => this.onPointerDown(e));
-
-        window.addEventListener("keydown", (e) => {
-            const k = e.key.toLowerCase();
-
-            if (k === "p") this.debug = !this.debug;
-            else if (k === "m") {
-                this.audio.toggleEnabled();
-                if (this.audio.enabled) this.unlockAudioIfNeeded();
-            }
-        });
+        this.canvas.addEventListener("pointerdown", this.onPointerDownBound);
+        window.addEventListener("keydown", this.onKeyDownBound);
 
         this.running = true;
         requestAnimationFrame((t) => this.loop(t));
+    }
+
+    destroy() {
+        this.running = false;
+        this.canvas.removeEventListener("pointerdown", this.onPointerDownBound);
+        window.removeEventListener("keydown", this.onKeyDownBound);
+        this.audio.stopMusic();
     }
 
     loadImage(url) {
@@ -119,9 +128,6 @@ export class Game {
     }
 
     onPointerDown(e) {
-        this.unlockAudioIfNeeded();
-        this.audio.playEffect("pew");
-
         const rect = this.canvas.getBoundingClientRect();
         const scaleX = this.canvas.width / rect.width;
         const scaleY = this.canvas.height / rect.height;
@@ -133,6 +139,9 @@ export class Game {
         const offsetY = touchY - this.playerPos.y;
 
         if (offsetX < 0) return; // no backward shots
+
+        this.unlockAudioIfNeeded();
+        this.audio.playEffect("pew");
 
         const dir = normalize(offsetX, offsetY);
         const shootAmount = { x: dir.x * 1000, y: dir.y * 1000 };
@@ -184,7 +193,6 @@ export class Game {
                 const ma = this.monsterAABB(m);
 
                 if (intersectsAABB(pa, ma)) {
-                    // Equivalent of removing both nodes on contact
                     p.active = false;
                     m.active = false;
                     break;
